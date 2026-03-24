@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COINLAB — BUILD YOUR COIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --lime:#C8F135; --pink:#F03C6E; --navy:#12113A; --cream:#F5F2E8;
+  --orange:#FF7A1A; --white:#FEFEFE;
+}
+html { scroll-behavior: smooth; }
+body { background:var(--cream); color:var(--navy); font-family:'DM Sans',sans-serif; overflow-x:hidden; }
+
+/* HEADER */
+.header { background:var(--navy); position:relative; overflow:hidden; padding:2rem 2rem 0; }
+.header-bg-stripe { position:absolute; bottom:0; right:-5%; width:55%; height:100%; background:var(--lime); transform:skewX(-8deg); transform-origin:bottom right; }
+.header-inner { position:relative; z-index:2; max-width:900px; margin:0 auto; display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; padding-bottom:1.5rem; flex-wrap:wrap; }
+.logo-eyebrow { font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.45); margin-bottom:4px; }
+.logo-title { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(38px,7vw,72px); line-height:0.92; letter-spacing:-0.02em; color:var(--white); }
+.logo-title em { font-style:normal; color:var(--lime); }
+.header-tag { font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy); background:var(--lime); padding:6px 14px; border-radius:3px; align-self:flex-start; margin-top:8px; white-space:nowrap; }
+
+/* TICKER */
+.ticker-wrap { background:var(--pink); overflow:hidden; white-space:nowrap; padding:8px 0; }
+.ticker { display:inline-block; animation:ticker 32s linear infinite; font-family:'Syne Mono',monospace; font-size:12px; letter-spacing:0.06em; color:var(--white); }
+.ticker span { margin:0 20px; }
+.ticker .dot { opacity:0.4; }
+@keyframes ticker { 0%{transform:translateX(100vw)} 100%{transform:translateX(-100%)} }
+
+/* MAIN */
+.main { max-width:760px; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+
+/* PROGRESS */
+.progress-track { display:flex; gap:6px; margin-bottom:2.5rem; align-items:center; }
+.prog-step { height:4px; flex:1; background:rgba(18,17,58,0.12); border-radius:2px; overflow:hidden; }
+.prog-fill { height:100%; background:var(--pink); width:0%; transition:width 0.4s ease; border-radius:2px; }
+.prog-label { font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(18,17,58,0.4); flex-shrink:0; }
+
+/* STEPS */
+.step { display:none; }
+.step.active { display:block; animation:stepIn 0.28s ease; }
+@keyframes stepIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.step-kicker { font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--pink); margin-bottom:8px; }
+.step-headline { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(26px,5vw,48px); line-height:1.0; letter-spacing:-0.025em; color:var(--navy); margin-bottom:10px; }
+.step-sub { font-size:14px; line-height:1.7; color:rgba(18,17,58,0.55); max-width:560px; margin-bottom:2rem; }
+.step-sub strong { color:var(--navy); font-weight:500; }
+
+/* INTRO */
+.intro-stats { display:flex; gap:12px; margin-bottom:2rem; flex-wrap:wrap; }
+.istat { flex:1; min-width:120px; background:var(--navy); color:var(--lime); border-radius:8px; padding:16px 14px; position:relative; overflow:hidden; }
+.istat-num { font-family:'Syne',sans-serif; font-weight:800; font-size:28px; letter-spacing:-0.02em; display:block; line-height:1; margin-bottom:4px; }
+.istat-label { font-size:12px; color:rgba(200,241,53,0.55); }
+
+/* OPTIONS */
+.opts { display:flex; flex-direction:column; gap:9px; }
+.opts.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.opt { border:2px solid rgba(18,17,58,0.12); border-radius:10px; padding:15px 17px; cursor:pointer; background:var(--white); transition:border-color 0.15s,background 0.15s,transform 0.1s; position:relative; user-select:none; }
+.opt:hover { border-color:var(--navy); transform:translateY(-2px); }
+.opt:active { transform:translateY(0); }
+.opt.sel-multi { background:var(--lime); border-color:var(--navy); }
+.opt.sel-single { background:var(--navy); border-color:var(--navy); }
+.opt.sel-single .opt-name { color:var(--lime); }
+.opt.sel-single .opt-desc { color:rgba(255,255,255,0.55); }
+.opt.sel-single .opt-badge { opacity:0.6; }
+.opt.dimmed { opacity:0.3; pointer-events:none; }
+.opt-inner { display:flex; align-items:flex-start; gap:12px; }
+.opt-icon { font-size:20px; flex-shrink:0; margin-top:2px; }
+.opt-content { flex:1; }
+.opt-name { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; letter-spacing:-0.01em; color:var(--navy); margin-bottom:3px; }
+.opt-desc { font-size:13px; color:rgba(18,17,58,0.52); line-height:1.5; }
+.opt-badge { display:inline-block; font-family:'Syne Mono',monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; padding:3px 9px; border-radius:3px; margin-top:8px; background:rgba(18,17,58,0.07); color:rgba(18,17,58,0.5); }
+.opt.sel-multi .opt-badge { background:rgba(18,17,58,0.1); }
+.sel-limit-note { font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(18,17,58,0.38); margin-bottom:10px; }
+.sel-count { font-family:'Syne',sans-serif; font-weight:800; color:var(--pink); }
+.conflict-note { background:#FFF5E0; border:2px solid var(--orange); border-radius:8px; padding:10px 14px; font-size:13px; color:#8a4000; margin-top:10px; display:none; line-height:1.6; font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.03em; }
+
+/* NAV */
+.nav { display:flex; gap:10px; margin-top:1.75rem; align-items:center; flex-wrap:wrap; }
+.warn { font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.06em; color:var(--pink); margin-top:6px; display:none; }
+.btn { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; letter-spacing:-0.01em; padding:12px 24px; border-radius:7px; cursor:pointer; border:2px solid var(--navy); background:transparent; color:var(--navy); transition:all 0.15s; }
+.btn:hover { background:var(--navy); color:var(--lime); }
+.btn-primary { background:var(--navy); color:var(--lime); }
+.btn-primary:hover { background:#1e1c50; }
+.btn-mint { background:var(--pink); color:var(--white); border-color:var(--pink); font-size:16px; padding:13px 28px; }
+.btn-mint:hover { background:#d02a5e; }
+
+/* ═══ NAME BUILDER ═══ */
+.name-builder {
+  background:var(--navy);
+  border-radius:14px;
+  padding:1.75rem;
+  margin-bottom:1.5rem;
+}
+.nb-label { font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:rgba(200,241,53,0.45); margin-bottom:1rem; }
+
+/* The big name display */
+.nb-display {
+  display:flex;
+  align-items:stretch;
+  gap:0;
+  margin-bottom:1.5rem;
+  border:2px solid rgba(200,241,53,0.2);
+  border-radius:10px;
+  overflow:hidden;
+  background:rgba(255,255,255,0.04);
+}
+.nb-part {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:1.25rem 0.5rem;
+  position:relative;
+  cursor:pointer;
+  transition:background 0.15s;
+  min-height:110px;
+}
+.nb-part:hover { background:rgba(200,241,53,0.08); }
+.nb-part:first-child { border-right:2px solid rgba(200,241,53,0.15); }
+.nb-part-arrow {
+  font-size:11px;
+  color:rgba(200,241,53,0.35);
+  margin-bottom:6px;
+  font-family:'Syne Mono',monospace;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.nb-word {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:clamp(22px,4.5vw,36px);
+  letter-spacing:-0.02em;
+  color:var(--lime);
+  line-height:1;
+  text-align:center;
+  transition:transform 0.12s, opacity 0.12s;
+  min-height:1.2em;
+}
+.nb-word.flash { animation:wordFlash 0.18s ease; }
+@keyframes wordFlash { 0%{opacity:0;transform:translateY(-6px)} 100%{opacity:1;transform:translateY(0)} }
+.nb-part-hint { font-size:11px; color:rgba(200,241,53,0.3); margin-top:5px; font-family:'Syne Mono',monospace; letter-spacing:0.08em; text-transform:uppercase; }
+
+.nb-full-preview {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:clamp(28px,6vw,52px);
+  letter-spacing:-0.025em;
+  color:var(--white);
+  text-align:center;
+  margin-bottom:1.25rem;
+  line-height:1;
+  min-height:1.2em;
+  transition:all 0.2s;
+}
+.nb-full-preview span { color:var(--lime); }
+
+/* Picker rows */
+.nb-pickers { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.25rem; }
+.nb-picker { }
+.nb-picker-label { font-family:'Syne Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(200,241,53,0.4); margin-bottom:7px; }
+.nb-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.nb-chip {
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:-0.01em;
+  padding:5px 12px;
+  border-radius:5px;
+  border:2px solid rgba(200,241,53,0.2);
+  color:rgba(200,241,53,0.5);
+  cursor:pointer;
+  transition:all 0.12s;
+  background:transparent;
+}
+.nb-chip:hover { border-color:var(--lime); color:var(--lime); }
+.nb-chip.active { background:var(--lime); border-color:var(--lime); color:var(--navy); }
+
+.nb-actions {
+  display:flex;
+  gap:8px;
+  margin-bottom:0;
+}
+.nb-use-btn {
+  flex:1;
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:-0.01em;
+  padding:11px 18px;
+  border-radius:6px;
+  border:2px solid rgba(200,241,53,0.25);
+  background:transparent;
+  color:rgba(200,241,53,0.5);
+  cursor:pointer;
+  transition:all 0.15s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.nb-use-btn:hover { border-color:var(--lime); color:var(--lime); }
+.nb-use-btn.selected {
+  background:var(--lime);
+  border-color:var(--lime);
+  color:var(--navy);
+}
+.nb-use-tick {
+  font-size:14px;
+  opacity:0;
+  transition:opacity 0.15s;
+}
+.nb-use-btn.selected .nb-use-tick { opacity:1; }
+
+.nb-shuffle {
+  font-family:'Syne Mono',monospace;
+  font-size:12px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:11px 16px;
+  border-radius:6px;
+  border:2px solid rgba(200,241,53,0.2);
+  background:transparent;
+  color:rgba(200,241,53,0.5);
+  cursor:pointer;
+  transition:all 0.15s;
+  white-space:nowrap;
+}
+.nb-shuffle:hover { border-color:var(--lime); color:var(--lime); }
+
+.nb-custom-wrap { position:relative; }
+.nb-custom-badge {
+  display:none;
+  margin-top:8px;
+  font-family:'Syne Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--lime);
+  padding:6px 12px;
+  background:rgba(200,241,53,0.1);
+  border:1px solid rgba(200,241,53,0.2);
+  border-radius:5px;
+}
+.nb-custom-wrap.active .nb-custom-badge { display:block; }
+
+/* Custom name */
+.nb-divider { display:flex; align-items:center; gap:12px; margin:1.25rem 0 1rem; }
+.nb-divider::before, .nb-divider::after { content:''; flex:1; height:1px; background:rgba(200,241,53,0.1); }
+.nb-divider-text { font-family:'Syne Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(200,241,53,0.3); white-space:nowrap; }
+input[type=text] { width:100%; border:2px solid rgba(200,241,53,0.2); border-radius:8px; padding:13px 16px; font-family:'Syne',sans-serif; font-weight:700; font-size:20px; letter-spacing:-0.01em; color:var(--lime); background:rgba(255,255,255,0.05); outline:none; transition:border-color 0.15s; }
+input[type=text]::placeholder { color:rgba(200,241,53,0.2); }
+input[type=text]:focus { border-color:rgba(200,241,53,0.5); }
+
+/* RESULT */
+.result-hero { background:var(--navy); border-radius:14px; overflow:hidden; margin-bottom:1.25rem; }
+
+/* Top half: big name + diagonal lime stripe */
+.result-hero-top { position:relative; overflow:hidden; padding:2.5rem 2rem 2rem; min-height:180px; }
+.result-hero-stripe { position:absolute; top:0; right:-5%; width:45%; height:100%; background:var(--lime); transform:skewX(-6deg); transform-origin:top right; z-index:0; }
+.result-hero-name-block { position:relative; z-index:1; max-width:58%; }
+.r-coin-name { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(40px,8vw,76px); line-height:0.92; letter-spacing:-0.03em; color:var(--white); margin-bottom:6px; word-break:break-word; }
+.r-sub { font-family:'Syne Mono',monospace; font-size:12px; letter-spacing:0.1em; color:rgba(255,255,255,0.3); margin-bottom:1rem; text-transform:uppercase; }
+.type-tags { display:flex; flex-wrap:wrap; gap:7px; }
+.type-tag { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.02em; padding:5px 13px; border-radius:4px; border:2px solid; }
+
+/* Bottom half: stats, fully solid, no stripe interference */
+.result-hero-bottom { padding:1.25rem 2rem 1.5rem; border-top:1px solid rgba(255,255,255,0.07); }
+.stats-row { display:flex; gap:8px; flex-wrap:wrap; }
+.rstat { background:rgba(255,255,255,0.08); border-radius:7px; padding:12px 16px; flex:1; min-width:90px; }
+.rstat-label { font-family:'Syne Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.12em; color:rgba(255,255,255,0.3); margin-bottom:4px; }
+.rstat-val { font-family:'Syne',sans-serif; font-weight:800; font-size:20px; letter-spacing:-0.01em; color:var(--lime); }
+.vol-bg { background:rgba(255,255,255,0.12); border-radius:2px; height:3px; margin-top:6px; overflow:hidden; }
+.vol-fill { height:100%; border-radius:2px; background:var(--lime); transition:width 1.2s ease; }
+
+/* VERDICT */
+.verdict-strip { background:var(--pink); border-radius:10px; padding:1.5rem; margin-bottom:1.25rem; }
+.verdict-strip p { font-size:15px; line-height:1.8; color:var(--white); font-style:italic; }
+
+/* BREAKDOWN */
+.breakdown-wrap { background:var(--white); border:2px solid rgba(18,17,58,0.1); border-radius:12px; padding:1.5rem; margin-bottom:1rem; }
+.section-label { font-family:'Syne Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:rgba(18,17,58,0.3); margin-bottom:1rem; display:flex; align-items:center; gap:10px; }
+.section-label::after { content:''; flex:1; height:1px; background:rgba(18,17,58,0.1); }
+
+.bcard { border-radius:8px; padding:15px 17px; margin-bottom:10px; border-left:4px solid; }
+.bcard-head { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; letter-spacing:-0.01em; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+.bcard-body { font-size:14px; color:rgba(18,17,58,0.68); line-height:1.75; margin-bottom:8px; }
+.bcard-catch { font-size:13px; padding:10px 13px; border-radius:6px; line-height:1.65; border:1.5px dashed; }
+.bcard-catch strong { font-weight:500; }
+
+.combo-box { background:#EAF2FF; border:2px solid #4A7FD4; border-radius:8px; padding:15px 17px; font-size:14px; line-height:1.75; color:#1A3A7A; margin-bottom:10px; }
+.combo-box .combo-head { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; color:#1A56A0; margin-bottom:6px; }
+.combo-box .combo-ex { font-family:'Syne Mono',monospace; font-size:11px; color:#4A7FD4; margin-top:8px; letter-spacing:0.04em; }
+
+.tension-box { background:#FFF5E0; border:2px solid var(--orange); border-radius:8px; padding:15px 17px; font-size:14px; line-height:1.75; color:#7A3A00; margin-bottom:10px; }
+.tension-box strong { color:var(--orange); font-family:'Syne',sans-serif; display:block; margin-bottom:4px; }
+
+.examples-box { background:var(--navy); border-radius:8px; padding:15px 17px; }
+.examples-box .ex-label { font-family:'Syne Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(200,241,53,0.35); margin-bottom:7px; }
+.examples-box .ex-body { font-size:13px; color:rgba(200,241,53,0.65); line-height:1.7; }
+
+/* OUTCOME */
+.outcome-wrap { margin-top: 1rem; }
+.outcome-card {
+  background: var(--navy);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(200,241,53,0.15);
+}
+.outcome-header {
+  background: var(--lime);
+  padding: 1rem 1.5rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.outcome-header-icon { font-size: 20px; }
+.outcome-header-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+}
+.outcome-header-sub {
+  font-family: 'Syne Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(18,17,58,0.5);
+  margin-left: auto;
+  white-space: nowrap;
+}
+.outcome-body { padding: 1.5rem; }
+.outcome-headline {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(18px, 3.5vw, 26px);
+  letter-spacing: -0.02em;
+  color: var(--lime);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.outcome-timeline { display: flex; flex-direction: column; gap: 0; }
+.outcome-event {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+}
+.outcome-event:last-child { border-bottom: none; }
+.outcome-dot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  padding-top: 3px;
+}
+.outcome-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--lime);
+  flex-shrink: 0;
+}
+.outcome-dot-line {
+  width: 2px;
+  flex: 1;
+  background: rgba(200,241,53,0.15);
+  margin-top: 3px;
+}
+.outcome-event:last-child .outcome-dot-line { display: none; }
+.outcome-event-content { flex: 1; padding-bottom: 4px; }
+.outcome-event-time {
+  font-family: 'Syne Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(200,241,53,0.35);
+  margin-bottom: 3px;
+}
+.outcome-event-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.75);
+}
+.outcome-event-text strong { color: var(--lime); font-weight: 500; }
+.outcome-event-text em { color: rgba(255,255,255,0.45); font-style: normal; }
+.outcome-finale {
+  margin-top: 1.25rem;
+  background: rgba(200,241,53,0.06);
+  border: 1px solid rgba(200,241,53,0.15);
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+}
+.outcome-finale strong { color: var(--lime); font-style: normal; font-weight: 500; }
+
+footer { text-align:center; padding:1.5rem 1rem; font-family:'Syne Mono',monospace; font-size:11px; color:rgba(18,17,58,0.28); letter-spacing:0.06em; }
+
+@media (max-width:500px) {
+  .opts.grid-2 { grid-template-columns:1fr; }
+  .intro-stats { flex-direction:column; }
+  .result-hero-name-block { max-width:100%; }
+  .r-coin-name { font-size:38px; }
+  .result-hero-stripe { display:none; }
+  .nb-pickers { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-bg-stripe"></div>
+  <div class="header-inner">
+    <div>
+      <div class="logo-eyebrow">Ultra Pro Investor Edition™</div>
+      <div class="logo-title">COIN<br><em>LAB</em></div>
+    </div>
+    <div class="header-tag">Not financial advice ↗</div>
+  </div>
+</div>
+
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span>🚀 DOGE +420%</span><span class="dot">·</span>
+    <span>💀 LUNA −99.9%</span><span class="dot">·</span>
+    <span>YOUR SAVINGS −100%</span><span class="dot">·</span>
+    <span>YACHT FUND +∞</span><span class="dot">·</span>
+    <span>GOVERNANCE VOTE: 3 wallets showed up</span><span class="dot">·</span>
+    <span>ALGO STABLECOIN: "it's fine" — last words before $40B wiped</span><span class="dot">·</span>
+    <span>SER HAVE YOU HEARD OF WEB3</span><span class="dot">·</span>
+    <span>THIS IS NOT THE BOTTOM</span><span class="dot">·</span>
+    <span>🚀 DOGE +420%</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="progress-track">
+    <div class="prog-step"><div class="prog-fill" id="p0"></div></div>
+    <div class="prog-step"><div class="prog-fill" id="p1"></div></div>
+    <div class="prog-step"><div class="prog-fill" id="p2"></div></div>
+    <div class="prog-step"><div class="prog-fill" id="p3"></div></div>
+    <div class="prog-step"><div class="prog-fill" id="p4"></div></div>
+    <div class="prog-step"><div class="prog-fill" id="p5"></div></div>
+    <span class="prog-label" id="prog-label">Intro</span>
+  </div>
+
+  <!-- ══ 0: INTRO ══ -->
+  <div class="step active" id="step-0">
+    <div class="step-kicker">Welcome, future disruptor</div>
+    <div class="step-headline">So you want<br>to print money.</div>
+    <div class="step-sub">Everyone has a coin. Your barber. Your mum. A labrador in Tokyo. Most real coins are hybrids — pick <strong>as many features as apply</strong>, answer a couple of questions, and we'll build you a proper breakdown of what you've made, what it's called, and what could spectacularly blow up in your face.</div>
+    <div class="intro-stats">
+      <div class="istat"><span class="istat-num">22K+</span><span class="istat-label">Coins launched</span></div>
+      <div class="istat"><span class="istat-num">~40%</span><span class="istat-label">Already dead</span></div>
+      <div class="istat"><span class="istat-num">Pick all</span><span class="istat-label">That apply</span></div>
+    </div>
+    <div class="nav"><button class="btn btn-primary" onclick="goTo(1)">Start building →</button></div>
+  </div>
+
+  <!-- ══ 1: PURPOSE ══ -->
+  <div class="step" id="step-1">
+    <div class="step-kicker">Step 1 — pick all that apply</div>
+    <div class="step-headline">What does your<br>coin actually do?</div>
+    <div class="step-sub">Most real coins serve multiple purposes. Select everything that applies — you can pick as many as you like. We'll ask follow-up questions based on what you choose.</div>
+    <p class="sel-limit-note">Selected: <span class="sel-count" id="sel-count">0</span> / 7</p>
+    <div class="opts" id="q-purpose">
+      <div class="opt" data-key="utility" onclick="multiToggle(this)">
+        <div class="opt-inner"><span class="opt-icon">🔑</span><div class="opt-content">
+          <div class="opt-name">Utility — it has an actual job</div>
+          <div class="opt-desc">People need your coin to access a platform, pay fees, or unlock features. Demand comes from real usage — the most honest form of token value there is.</div>
+          <span class="opt-badge">Medium risk</span>
+        </div></div>
+      </div>
+      <div class="opt" data-key="meme" onclick="multiToggle(this)">
+        <div class="opt-inner"><span class="opt-icon">🐶</span><div class="opt-content">
+          <div class="opt-name">Meme / Community — vibes only</div>
+          <div class="opt-desc">No product, no roadmap, probably a dog on the logo. Value is pure collective belief — and occasionally, collective profit. Dogecoin has a multi-billion dollar market cap. The joke became the economy.</div>
+          <span class="opt-badge">Extreme risk</span>
+        </div></div>
+      </div>
+      <div class="opt" data-key="governance" onclick="multiToggle(this)">
+        <div class="opt-inner"><span class="opt-icon">🗳️</span><div class="opt-content">
+          <div class="opt-name">Governance — holders vote on things</div>
+          <div class="opt-desc">Token holders vote on protocol decisions. Democracy! In theory. In practice, the top 50 wallets usually own enough to outvote everyone else combined.</div>
+          <span class="opt-badge">Medium risk</span>
+        </div></div>
+      </div>
+      <div class="opt" data-key="store" onclick="multiToggle(this)">
+        <div class="opt-inner"><span class="opt-icon">💎</span><div class="opt-content">
+          <div class="opt-name">Store of Value — digital gold</div>
+          <div class="opt-desc">Fixed supply, scarce by design. A bet that demand grows while supply stays flat. It's worked brilliantly for Bitcoin for 15 years. HODLers welcome.</div>
+          <span class="opt-badge">Medium (long-term)</span>
+        </div></div>
+      </div>
+      <div class="opt" data-key="defi" onclick="multiToggle(this)">
+        <div class="opt-inner"><span class="opt-icon">📈</span><div class="opt-content">
+          <div class="opt-name">DeFi / Yield — earn money with money</div>
+          <div class="opt-desc">Powers lending, borrowing, liquidity pools, yield farming — all without a bank in the middle. Genuinely revolutionary. Also the most-hacked sector in crypto by a comfortable margin.</div>
+          <span class="opt-badge">High risk</span>
+        </div></div>
+      </div>
+      <div class="opt" data-key="payment" onclick="multiToggle(this)">
+        <div class="opt-inner"><span class="opt-icon">💸</span><div class="opt-content">
+          <div class="opt-name">Payments — like money, but on a blockchain</div>
+          <div class="opt-desc">Fast, cheap, borderless transactions without a bank in the middle. The original crypto dream. A handful of chains have actually cracked this. Hundreds have claimed to.</div>
+          <span class="opt-badge">Medium risk</span>
+        </div></div>
+      </div>
+      <div class="opt" data-key="stable" onclick="multiToggle(this)">
+        <div class="opt-inner"><span class="opt-icon">⚖️</span><div class="opt-content">
+          <div class="opt-name">Stablecoin — pegged to a real-world value</div>
+          <div class="opt-desc">Designed to hold a steady price (usually $1). The most boring type of crypto — and arguably the most important. We'll ask how it stays stable in a moment.</div>
+          <span class="opt-badge">Risk varies wildly by type</span>
+        </div></div>
+      </div>
+    </div>
+    <div class="warn" id="warn-1">→ Pick at least one feature to continue.</div>
+    <div class="nav">
+      <button class="btn" onclick="goTo(0)">← Back</button>
+      <button class="btn btn-primary" onclick="nextFrom1()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══ 2: STABLE TYPE (conditional) ══ -->
+  <div class="step" id="step-2">
+    <div class="step-kicker">Follow-up — stablecoin mechanics</div>
+    <div class="step-headline">How does it<br>stay stable?</div>
+    <div class="step-sub">All stablecoins want to be worth $1. They get there in completely different ways — and they fail in completely different ways too. This distinction matters enormously.</div>
+    <div class="opts" id="q-stable">
+      <div class="opt" data-key="fiat" onclick="singleSelect('stable',this)">
+        <div class="opt-inner"><span class="opt-icon">🏦</span><div class="opt-content">
+          <div class="opt-name">Fiat-backed — real dollars in a real bank</div>
+          <div class="opt-desc">1:1 backed by actual USD (or GBP, EUR) held in a bank or money market fund. Simple, auditable, and trusted. You hold the dollars and issue tokens against them. USDC publishes monthly reserve attestations. The boring choice is usually the right choice.</div>
+          <span class="opt-badge">Lowest risk — boring is beautiful</span>
+        </div></div>
+      </div>
+      <div class="opt" data-key="crypto" onclick="singleSelect('stable',this)">
+        <div class="opt-inner"><span class="opt-icon">⛓️</span><div class="opt-content">
+          <div class="opt-name">Crypto-collateralised — backed by other crypto</div>
+          <div class="opt-desc">Over-collateralised — deposit $150 of ETH to mint $100 of stablecoin — to absorb price swings. Fully on-chain, no banks required, genuinely decentralised. MakerDAO's DAI has maintained its peg through multiple 80%+ crypto crashes using this model since 2017.</div>
+          <span class="opt-badge">Medium risk — clever but complex</span>
+        </div></div>
+      </div>
+      <div class="opt" data-key="algo" onclick="singleSelect('stable',this)">
+        <div class="opt-inner"><span class="opt-icon">🤖</span><div class="opt-content">
+          <div class="opt-name">Algorithmic — backed by maths and prayers</div>
+          <div class="opt-desc">No collateral at all. Smart contracts mint and burn tokens to maintain the peg. Elegant in theory, capital-efficient on paper. In May 2022, Terra/LUNA lost $40 billion in 72 hours and triggered a global crypto contagion. We mention this for educational purposes.</div>
+          <span class="opt-badge">Very high risk — ask Terra how it went</span>
+        </div></div>
+      </div>
+    </div>
+    <div class="warn" id="warn-2">→ Pick a stability mechanism to continue.</div>
+    <div class="nav">
+      <button class="btn" onclick="goTo(1)">← Back</button>
+      <button class="btn btn-primary" onclick="nextFrom2()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══ 3: SUPPLY ══ -->
+  <div class="step" id="step-3">
+    <div class="step-kicker" id="step3-kicker">Step 2 of 3 — supply model</div>
+    <div class="step-headline">How many coins<br>will ever exist?</div>
+    <div class="step-sub">This single decision shapes everything: scarcity, inflation, staking rewards, and whether your coin feels like digital gold or a supermarket loyalty card.</div>
+    <div class="opts" id="q-supply">
+      <div class="opt" data-key="fixed" onclick="singleSelect('supply',this)">
+        <div class="opt-inner"><span class="opt-icon">🔒</span><div class="opt-content">
+          <div class="opt-name">Fixed cap — like Bitcoin's 21 million</div>
+          <div class="opt-desc">Hard limit forever. Scarcity is structural and permanent. As demand grows and supply can't respond, price does all the adjusting. Beloved by long-term holders and Austrian economists everywhere.</div>
+        </div></div>
+      </div>
+      <div class="opt" data-key="inflationary" onclick="singleSelect('supply',this)">
+        <div class="opt-inner"><span class="opt-icon">♾️</span><div class="opt-content">
+          <div class="opt-name">Inflationary — new coins can always be minted</div>
+          <div class="opt-desc">Useful for staking rewards, liquidity mining incentives, and ongoing development funding. Most DeFi tokens use this model. Ethereum partially offsets inflation by burning transaction fees. Requires someone sensible controlling the printer.</div>
+        </div></div>
+      </div>
+      <div class="opt" data-key="elastic" onclick="singleSelect('supply',this)">
+        <div class="opt-inner"><span class="opt-icon">📌</span><div class="opt-content">
+          <div class="opt-name">Elastic — supply adjusts to hit a price target</div>
+          <div class="opt-desc">Expands and contracts automatically to maintain a target price. Required plumbing for algorithmic stablecoins. Works smoothly in calm, liquid markets — and can catastrophically accelerate the spiral it was designed to stop when markets panic.</div>
+        </div></div>
+      </div>
+    </div>
+    <div class="conflict-note" id="supply-conflict"></div>
+    <div class="warn" id="warn-3">→ Pick a supply model to continue.</div>
+    <div class="nav">
+      <button class="btn" onclick="backFrom3()">← Back</button>
+      <button class="btn btn-primary" onclick="nextFrom3()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══ 4: GOVERNANCE ══ -->
+  <div class="step" id="step-4">
+    <div class="step-kicker" id="step4-kicker">Step 3 — who's in charge</div>
+    <div class="step-headline">Who controls<br>this thing?</div>
+    <div class="step-sub">Every coin needs someone — or something — making decisions. Who gets the power, and who gets the blame when it all goes sideways?</div>
+    <div class="opts grid-2" id="q-control">
+
+      <div class="opt" data-key="company" onclick="singleSelect('control',this)">
+        <div class="opt-inner"><span class="opt-icon">🏢</span><div class="opt-content">
+          <div class="opt-name">A company</div>
+          <div class="opt-desc">One organisation makes all decisions. Efficient, fast, accountable. Also the exact thing crypto was invented to eliminate — a single centralised point of trust and failure.</div>
+        </div></div>
+      </div>
+
+      <div class="opt" data-key="dao" onclick="singleSelect('control',this)">
+        <div class="opt-inner"><span class="opt-icon">🌐</span><div class="opt-content">
+          <div class="opt-name">A DAO (token holders vote)</div>
+          <div class="opt-desc">Decentralised governance — every major decision goes to a community vote. In practice: participation under 5%, and one wallet with 60% of the supply.</div>
+        </div></div>
+      </div>
+
+      <div class="opt" data-key="founders" onclick="singleSelect('control',this)">
+        <div class="opt-inner"><span class="opt-icon">👤</span><div class="opt-content">
+          <div class="opt-name">The founders (for now)</div>
+          <div class="opt-desc">A small founding team runs things until the project is "sufficiently decentralised." A common approach — and a phrase that has done a lot of heavy lifting in regulatory conversations.</div>
+        </div></div>
+      </div>
+
+      <div class="opt" data-key="nobody" onclick="singleSelect('control',this)">
+        <div class="opt-inner"><span class="opt-icon">🤖</span><div class="opt-content">
+          <div class="opt-name">Nobody — smart contracts only</div>
+          <div class="opt-desc">Code runs everything automatically. Rules are set at launch, no human can override them. Maximum trustlessness. Also: if there's a bug, nobody can fix it.</div>
+        </div></div>
+      </div>
+
+    </div>
+    <div class="warn" id="warn-4">→ Someone has to take the blame. Pick one.</div>
+    <div class="nav">
+      <button class="btn" onclick="goTo(3)">← Back</button>
+      <button class="btn btn-primary" onclick="nextFrom4()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══ 5: NAME BUILDER ══ -->
+  <div class="step" id="step-5">
+    <div class="step-kicker">Final step — name your coin</div>
+    <div class="step-headline">What's it called?</div>
+    <div class="step-sub">Build a name from the parts below, or type your own. Hit <strong>Use this name</strong> to lock it in.</div>
+
+    <div class="name-builder">
+      <div class="nb-label">Click prefix or suffix to cycle · or pick from the lists below</div>
+
+      <div class="nb-display">
+        <div class="nb-part" onclick="cyclePrefix()" title="Click to cycle prefix">
+          <div class="nb-part-arrow">▲ ▼ click to cycle</div>
+          <div class="nb-word" id="nb-prefix">Safe</div>
+          <div class="nb-part-hint">prefix</div>
+        </div>
+        <div class="nb-part" onclick="cycleSuffix()" title="Click to cycle suffix">
+          <div class="nb-part-arrow">▲ ▼ click to cycle</div>
+          <div class="nb-word" id="nb-suffix">Swap</div>
+          <div class="nb-part-hint">suffix</div>
+        </div>
+      </div>
+
+      <div class="nb-full-preview" id="nb-preview">SafeSwap</div>
+
+      <div class="nb-pickers">
+        <div class="nb-picker">
+          <div class="nb-picker-label">Prefixes</div>
+          <div class="nb-chips" id="prefix-chips"></div>
+        </div>
+        <div class="nb-picker">
+          <div class="nb-picker-label">Suffixes</div>
+          <div class="nb-chips" id="suffix-chips"></div>
+        </div>
+      </div>
+
+      <div class="nb-actions">
+        <button class="nb-use-btn" id="nb-use-btn" onclick="selectGeneratedName()">
+          <span class="nb-use-tick" id="nb-use-tick">✓</span>
+          <span id="nb-use-label">Use this name</span>
+        </button>
+        <button class="nb-shuffle" onclick="shuffleBoth()">⟳ Shuffle</button>
+      </div>
+
+      <div class="nb-divider"><span class="nb-divider-text">or type your own</span></div>
+      <div class="nb-custom-wrap" id="nb-custom-wrap">
+        <input type="text" id="coinName" placeholder="MOONBUCKS, SAFEYACHT…" maxlength="28" oninput="onCustomType()" />
+        <div class="nb-custom-badge" id="nb-custom-badge">✓ Using custom name</div>
+      </div>
+    </div>
+
+    <div class="warn" id="warn-5">→ Your coin needs a name.</div>
+    <div class="nav">
+      <button class="btn" onclick="goTo(4)">← Back</button>
+      <button class="btn btn-mint" onclick="showResult()">Mint my coin →</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULT ══ -->
+  <div class="step" id="step-result">
+    <div class="result-hero">
+      <div class="result-hero-top">
+        <div class="result-hero-stripe"></div>
+        <div class="result-hero-name-block">
+          <div class="r-coin-name" id="r-name"></div>
+          <div class="r-sub" id="r-sub"></div>
+          <div class="type-tags" id="r-tags"></div>
+        </div>
+      </div>
+      <div class="result-hero-bottom">
+        <div class="stats-row" id="r-stats"></div>
+      </div>
+    </div>
+    <div class="verdict-strip"><p id="r-verdict"></p></div>
+    <div class="breakdown-wrap">
+      <div class="section-label">What you've actually built</div>
+      <div id="r-breakdown"></div>
+      <div id="r-combo"></div>
+      <div id="r-tension"></div>
+      <div class="examples-box"><div class="ex-label">Real coins like yours</div><div class="ex-body" id="r-examples"></div></div>
+    </div>
+    <div class="outcome-wrap" id="r-outcome"></div>
+    <div class="nav"><button class="btn" onclick="restart()">← Start over</button></div>
+  </div>
+</div>
+
+<footer>COINLAB™ IS AN EDUCATIONAL GAME · NOTHING HERE IS FINANCIAL ADVICE · DO NOT LAUNCH AN ACTUAL COIN BASED ON THIS TOOL</footer>
+
+<script>
+const answers = { purpose: new Set(), stable: null, supply: null, control: null };
+let prefixIdx = 0, suffixIdx = 0;
+let usingCustom = false;
+
+/* ─── NAME DATA ─── */
+const NAME_POOLS = {
+  utility:    { p:['Key','Gate','Access','Core','Base','Link','Open','Port'], s:['Protocol','Network','Layer','Hub','Works','Chain','Gate','Base'] },
+  meme:       { p:['Moon','Doge','Shib','Pepe','Bork','Woof','Wen','Fren'], s:['Inu','Moon','X','Finance','DAO','Pro','Ultra','Max'] },
+  governance: { p:['Gov','Vote','DAO','Voice','Forum','Council','Quorum','Nexus'], s:['DAO','Vote','Gov','Protocol','Network','Collective','Chain','Hub'] },
+  store:      { p:['Vault','Reserve','Safe','Fort','Gold','Hoard','Iron','Steel'], s:['Store','Vault','Gold','Reserve','Asset','Coin','Hold','Save'] },
+  defi:       { p:['Yield','Swap','Pool','Farm','Lend','Flux','Earn','Boost'], s:['Finance','Swap','Protocol','Money','Earn','Fi','Yield','Farm'] },
+  payment:    { p:['Pay','Send','Swift','Flash','Zap','Wire','Beam','Rush'], s:['Pay','Cash','Transfer','Send','Wire','Coin','Jet','Flow'] },
+  stable:     { p:['Stable','Peg','Anchor','Steady','Base','Fixed','Level','Flat'], s:['Dollar','USD','Stable','Peg','Cash','Coin','Buck','Note'] },
+};
+const FALLBACK = { p:['Safe','Moon','Meta','Ultra','Prime','Alpha'], s:['Coin','Fi','X','Pro','DAO','Chain'] };
+
+let prefixes = [], suffixes = [];
+
+function buildNamePools() {
+  const keys = [...answers.purpose];
+  const pSet = new Set(), sSet = new Set();
+  keys.forEach(k => {
+    const pool = NAME_POOLS[k] || FALLBACK;
+    pool.p.forEach(x => pSet.add(x));
+    pool.s.forEach(x => sSet.add(x));
+  });
+  if (!pSet.size) { FALLBACK.p.forEach(x => pSet.add(x)); FALLBACK.s.forEach(x => sSet.add(x)); }
+  prefixes = shuffle([...pSet]).slice(0, 10);
+  suffixes = shuffle([...sSet]).slice(0, 10);
+  prefixIdx = 0; suffixIdx = 0;
+  renderChips();
+  updatePreview();
+}
+
+function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+
+function renderChips() {
+  const pc = document.getElementById('prefix-chips');
+  const sc = document.getElementById('suffix-chips');
+  pc.innerHTML = prefixes.map((p, i) =>
+    `<span class="nb-chip ${i===prefixIdx?'active':''}" onclick="setPrefix(${i})">${p}</span>`
+  ).join('');
+  sc.innerHTML = suffixes.map((s, i) =>
+    `<span class="nb-chip ${i===suffixIdx?'active':''}" onclick="setSuffix(${i})">${s}</span>`
+  ).join('');
+}
+
+function flashWord(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+}
+
+function updatePreview() {
+  const pre = prefixes[prefixIdx] || '';
+  const suf = suffixes[suffixIdx] || '';
+  document.getElementById('nb-prefix').textContent = pre;
+  document.getElementById('nb-suffix').textContent = suf;
+  const full = pre + suf;
+  document.getElementById('nb-preview').innerHTML = `<span>${pre}</span>${suf}`;
+  if (!usingCustom) document.getElementById('coinName').value = '';
+}
+
+function selectGeneratedName() {
+  usingCustom = false;
+  document.getElementById('coinName').value = '';
+  document.getElementById('nb-use-btn').classList.add('selected');
+  document.getElementById('nb-use-label').textContent = 'Selected ✓';
+  document.getElementById('nb-custom-wrap').classList.remove('active');
+  document.getElementById('warn-5').style.display = 'none';
+}
+
+function deselectGeneratedName() {
+  document.getElementById('nb-use-btn').classList.remove('selected');
+  document.getElementById('nb-use-label').textContent = 'Use this name';
+}
+
+function cyclePrefix() {
+  prefixIdx = (prefixIdx + 1) % prefixes.length;
+  flashWord('nb-prefix'); deselectGeneratedName(); usingCustom = false;
+  renderChips(); updatePreview();
+}
+function cycleSuffix() {
+  suffixIdx = (suffixIdx + 1) % suffixes.length;
+  flashWord('nb-suffix'); deselectGeneratedName(); usingCustom = false;
+  renderChips(); updatePreview();
+}
+function setPrefix(i) { prefixIdx = i; deselectGeneratedName(); usingCustom = false; renderChips(); updatePreview(); flashWord('nb-prefix'); }
+function setSuffix(i) { suffixIdx = i; deselectGeneratedName(); usingCustom = false; renderChips(); updatePreview(); flashWord('nb-suffix'); }
+function shuffleBoth() {
+  buildNamePools();
+  prefixIdx = Math.floor(Math.random()*prefixes.length);
+  suffixIdx = Math.floor(Math.random()*suffixes.length);
+  usingCustom = false;
+  document.getElementById('coinName').value = '';
+  document.getElementById('nb-custom-wrap').classList.remove('active');
+  deselectGeneratedName();
+  renderChips(); updatePreview();
+  flashWord('nb-prefix'); flashWord('nb-suffix');
+}
+function onCustomType() {
+  usingCustom = true;
+  deselectGeneratedName();
+  const v = document.getElementById('coinName').value.toUpperCase();
+  document.getElementById('nb-preview').innerHTML = v || '<span style="opacity:0.3">Your Name</span>';
+  document.getElementById('nb-prefix').textContent = '—';
+  document.getElementById('nb-suffix').textContent = '—';
+  document.getElementById('warn-5').style.display = 'none';
+  document.querySelectorAll('.nb-chip').forEach(c => c.classList.remove('active'));
+  // Show/hide custom badge
+  const wrap = document.getElementById('nb-custom-wrap');
+  if (v) wrap.classList.add('active');
+  else wrap.classList.remove('active');
+}
+
+function getFinalName() {
+  // Custom typed name takes priority if filled
+  const typed = document.getElementById('coinName').value.trim();
+  if (usingCustom && typed) return typed;
+  // Generated name — only use if the button is selected OR arrays are populated (fallback)
+  const pre = prefixes[prefixIdx] || '';
+  const suf = suffixes[suffixIdx] || '';
+  const combined = (pre + suf).trim();
+  const btnSelected = document.getElementById('nb-use-btn').classList.contains('selected');
+  if (btnSelected && combined) return combined;
+  // Last resort if somehow neither — try typed anyway
+  if (typed) return typed;
+  return null;
+}
+
+/* ─── PROGRESS ─── */
+function setProgress(id) {
+  const map = { 0:0, 1:1, 2:2, 3:3, 4:4, 5:5, result:6 };
+  const labels = { 0:'Intro', 1:'Features', 2:'Stablecoin', 3:'Supply', 4:'Governance', 5:'Name', result:'Done!' };
+  const pos = map[id] ?? 0;
+  [0,1,2,3,4,5].forEach(i => {
+    document.getElementById('p'+i).style.width = pos > i ? '100%' : pos === i ? '60%' : '0%';
+  });
+  document.getElementById('prog-label').textContent = labels[id] || '';
+}
+
+function goTo(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + id).classList.add('active');
+  setProgress(id);
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* ─── MULTI SELECT ─── */
+function multiToggle(el) {
+  const key = el.dataset.key;
+  if (answers.purpose.has(key)) { answers.purpose.delete(key); el.classList.remove('sel-multi'); }
+  else {
+    if (answers.purpose.size >= 7) return;
+    answers.purpose.add(key); el.classList.add('sel-multi');
+  }
+  updateSelCount();
+  document.getElementById('warn-1').style.display = 'none';
+}
+function updateSelCount() {
+  const n = answers.purpose.size;
+  document.getElementById('sel-count').textContent = n;
+  document.querySelectorAll('#q-purpose .opt').forEach(o => {
+    if (!answers.purpose.has(o.dataset.key) && n >= 7) o.classList.add('dimmed');
+    else o.classList.remove('dimmed');
+  });
+}
+
+/* ─── SINGLE SELECT ─── */
+function singleSelect(q, el) {
+  document.querySelectorAll(`#q-${q} .opt`).forEach(o => o.classList.remove('sel-single'));
+  el.classList.add('sel-single');
+  answers[q] = el.dataset.key;
+  const w = { stable:'warn-2', supply:'warn-3', control:'warn-4' };
+  if (w[q]) document.getElementById(w[q]).style.display = 'none';
+  if (q === 'supply') checkSupplyConflict();
+}
+function checkSupplyConflict() {
+  const box = document.getElementById('supply-conflict');
+  const s = answers.supply, st = answers.stable, p = answers.purpose;
+  let msg = '';
+  if (s === 'elastic' && !p.has('stable')) msg = 'Heads up: elastic supply is mainly used by algorithmic stablecoins. Unusual without that feature — but not impossible.';
+  else if (s === 'fixed' && st === 'fiat') msg = 'Tension detected: fiat-backed stablecoins need to freely mint and redeem to maintain the peg. A fixed cap breaks the mechanism on day one.';
+  else if (s === 'fixed' && st === 'algo') msg = 'Tension detected: algorithmic stablecoins require elastic supply to function. A fixed cap makes stabilisation impossible.';
+  box.style.display = msg ? 'block' : 'none';
+  box.textContent = msg ? '⚠ ' + msg : '';
+}
+
+/* ─── NAVIGATION ─── */
+function nextFrom1() {
+  if (!answers.purpose.size) { document.getElementById('warn-1').style.display = 'block'; return; }
+  const withStable = answers.purpose.has('stable');
+  document.getElementById('step3-kicker').textContent = (withStable ? 'Step 3 of 5' : 'Step 2 of 4') + ' — supply model';
+  document.getElementById('step4-kicker').textContent = (withStable ? 'Step 4 of 5' : 'Step 3 of 4') + ' — who\'s in charge';
+  goTo(withStable ? 2 : 3);
+}
+function nextFrom2() {
+  if (!answers.stable) { document.getElementById('warn-2').style.display = 'block'; return; }
+  goTo(3);
+}
+function backFrom3() { goTo(answers.purpose.has('stable') ? 2 : 1); }
+function nextFrom3() {
+  if (!answers.supply) { document.getElementById('warn-3').style.display = 'block'; return; }
+  goTo(4);
+}
+function nextFrom4() {
+  if (!answers.control) { document.getElementById('warn-4').style.display = 'block'; return; }
+  buildNamePools();
+  goTo(5);
+}
+
+/* ─── TYPE DATA (full copy) ─── */
+const T = {
+  utility: {
+    icon:'🔑', label:'Utility Token', c:'#1A56A0', bg:'#EAF1FB', cb:'#D0E3F8',
+    body:'Your coin has a job. People genuinely need it to use something — pay fees, access features, unlock functionality. Demand is driven by real usage, which is the most honest form of token value there is. If your platform gets traction, token demand is structural rather than speculative.',
+    catch:'<strong>The catch:</strong> If your platform fails, your token goes with it. It\'s a subway token for a subway that hasn\'t been built yet. Utility tokens have collapsed to zero when their underlying products did — and risen dramatically when those products found product-market fit.'
+  },
+  meme: {
+    icon:'🐶', label:'Meme Coin', c:'#C0392B', bg:'#FDECEA', cb:'#FAD4D0',
+    body:'No product. No roadmap. Probably a dog or a frog on the logo. The entire value proposition is: other people will buy this after you, and some will do so before you sell. Dogecoin has a multi-billion dollar market cap. Shiba Inu briefly surpassed it. The joke became the economy, and that is a sentence that needs sitting with.',
+    catch:'<strong>The catch:</strong> What goes viral in February is dead by April. Meme coins go up like rockets and land like them too. The community IS the product — and communities dissolve. Only invest what you\'d happily set on fire at a barbecue.'
+  },
+  governance: {
+    icon:'🗳️', label:'Governance Token', c:'#6B3FA0', bg:'#F2EAFB', cb:'#E0D0F8',
+    body:'Token holders vote on protocol decisions — upgrades, fee changes, treasury allocations, parameter adjustments. The major DeFi protocols all use this model. In theory: decentralised democracy, power to the community. In practice: participation is often under 5% of holders, and the top 50 wallets usually own enough tokens to outvote everyone else combined.',
+    catch:'<strong>The catch:</strong> Voting power proportional to holdings is plutocracy with extra steps — and that\'s the best case. Governance attacks, where bad actors buy enough tokens to pass malicious proposals, have actually happened. MakerDAO has spent years refining its governance model precisely because naive implementations are exploitable.'
+  },
+  store: {
+    icon:'💎', label:'Store of Value', c:'#B05A00', bg:'#FDF0E0', cb:'#FAE0C0',
+    body:'Fixed supply, no central issuer — a bet that demand grows while supply stays flat. It\'s worked brilliantly for Bitcoin for 15 years. The thesis: fiat currency gets printed into oblivion by governments who cannot help themselves. Your coin has a hard cap. Mathematics and distributed consensus do the rest. Some very serious people believe this is the most important financial innovation in human history.',
+    catch:'<strong>The catch:</strong> Unlike gold, there\'s zero industrial demand. It\'s entirely faith-based. That faith has proven remarkably durable — and it is still faith. It\'s also extremely volatile in the short term, which makes it simultaneously the world\'s most compelling inflation hedge and its most stressful one.'
+  },
+  defi: {
+    icon:'📈', label:'DeFi Token', c:'#1A7A4A', bg:'#E8F8F0', cb:'#C8F0D8',
+    body:'Your coin powers permissionless finance — lending, borrowing, liquidity provision, yield farming — all without a bank, a broker, or anyone in a suit. Anyone with internet access can use your protocol at any hour from anywhere in the world. That\'s genuinely revolutionary. It\'s also the most-hacked sector in all of crypto by a comfortable margin, with billions lost annually to smart contract exploits.',
+    catch:'<strong>The catch:</strong> "Code is law" means no customer support when a bug drains the protocol. There is no 0800 number. Billions have been lost to exploits, flash loan attacks, and oracle manipulation. The upside is permissionless global finance; the downside is that when it goes wrong, it goes wrong at 3am and there\'s nobody to call.'
+  },
+  payment: {
+    icon:'💸', label:'Payment Coin', c:'#1A7A4A', bg:'#E8F8F0', cb:'#C8F0D8',
+    body:'The original crypto dream: digital cash for the internet. Fast, cheap, borderless transactions without a bank or payment processor taking a cut. A handful of chains — Solana, XRP, Stellar — have actually cracked this at scale. Hundreds of others have claimed to and found that competing with Visa\'s 20,000 transactions per second is a genuinely hard engineering problem.',
+    catch:'<strong>The catch:</strong> Speed, decentralisation, and security form an infamously difficult trilemma — most chains can only fully achieve two of the three. "Payment coin" is also one of the most overcrowded categories in crypto. You\'ll need a compelling reason why yours, specifically, is better.'
+  },
+  'stable-fiat': {
+    icon:'🏦', label:'Fiat-Backed Stablecoin', c:'#1A7A4A', bg:'#E8F8F0', cb:'#C8F0D8',
+    body:'Every coin is backed 1:1 by actual dollars (or euros, or pounds) held in a real bank account or money market fund. Simple, transparent, and auditable — USDC publishes monthly reserve attestations from major accounting firms. The boring choice is almost always the right choice, and fiat-backed stablecoins have proven the most resilient over time.',
+    catch:'<strong>The catch:</strong> You need a real bank — which means real jurisdiction, real KYC requirements, and the profound irony that your "decentralised" coin depends entirely on centralised financial institutions that can freeze your assets. USDC has had coins frozen on-chain at the request of authorities. Truly decentralised, it is not.'
+  },
+  'stable-crypto': {
+    icon:'⛓️', label:'Crypto-Collateralised Stablecoin', c:'#1A56A0', bg:'#EAF1FB', cb:'#D0E3F8',
+    body:'Backed by other crypto assets — typically over-collateralised (deposit $150 of ETH to mint $100 of stablecoin) to absorb price volatility without breaking the peg. Fully on-chain, no banks required, genuinely decentralised. MakerDAO\'s DAI has maintained its dollar peg through multiple 60-80% crypto market crashes since 2017 using precisely this mechanism.',
+    catch:'<strong>The catch:</strong> A sufficiently severe or fast market crash can eat through even generous collateral buffers and trigger cascading liquidations that make things worse. The system requires constant parameter monitoring and sophisticated risk management. It\'s not a set-and-forget mechanism — it\'s a living system that needs active governance.'
+  },
+  'stable-algo': {
+    icon:'🤖', label:'Algorithmic Stablecoin', c:'#C0392B', bg:'#FDECEA', cb:'#FAD4D0',
+    body:'No collateral whatsoever. Smart contracts use mint-and-burn mechanics to expand or contract supply and maintain the peg. When the price rises above $1, the protocol mints more coins to push it down. When it falls below $1, it burns coins to push it up. Elegant in theory and capital-efficient on paper. In May 2022, Terra/LUNA lost $40 billion in 72 hours and triggered the largest contagion in crypto history.',
+    catch:'<strong>The catch:</strong> Algorithmic stability holds only while confidence holds. Once confidence breaks, the very mechanism designed to restore the peg — burning the companion token to defend the stablecoin — can accelerate the collapse. The algorithm cannot fix a bank run. This is not a theoretical concern: it has happened multiple times, to multiple projects, with real consequences for real people.'
+  },
+  sup_fixed: {
+    icon:'🔒', label:'Fixed Supply', c:'#B05A00', bg:'#FDF0E0', cb:'#FAE0C0',
+    body:'A hard cap on the total number of coins that will ever exist — like Bitcoin\'s 21 million. Scarcity is structural and permanent, baked into the protocol itself. As demand grows and supply cannot respond, price must do all the adjustment. This is the favourite model of long-term holders, Austrian economists, and anyone who has watched a central bank print money.',
+    catch:'<strong>The catch:</strong> No new supply means no block rewards eventually. Bitcoin\'s long-term security model relies on transaction fees replacing mining rewards as the block subsidy approaches zero — and whether that generates sufficient security budget at scale is genuinely an open research question that will be answered by the market in the coming decades.'
+  },
+  sup_inflationary: {
+    icon:'♾️', label:'Inflationary Supply', c:'#555', bg:'#F4F4F0', cb:'#E4E4DC',
+    body:'New coins can always be minted — essential infrastructure for staking rewards, liquidity mining incentives, and ongoing protocol development funding. Most major DeFi tokens and proof-of-stake blockchains use this model. Ethereum introduced EIP-1559 fee burning to create deflationary pressure that partially offsets issuance, making ETH sometimes net-deflationary during high-activity periods.',
+    catch:'<strong>The catch:</strong> Unlimited minting dilutes existing holders over time if demand doesn\'t keep pace. The question isn\'t whether to inflate — it\'s by how much, under what governance, and whether token holders can actually vote to change the emission rate when it stops serving their interests.'
+  },
+  sup_elastic: {
+    icon:'📌', label:'Elastic Supply', c:'#6B3FA0', bg:'#F2EAFB', cb:'#E0D0F8',
+    body:'Supply expands and contracts automatically based on whether the coin trades above or below its target price. If it\'s above $1, the protocol mints new coins and distributes them to holders. If it\'s below $1, the protocol burns coins to reduce supply. It\'s the required plumbing for algorithmic stablecoins, and it works smoothly in calm, liquid markets with gradual price movements.',
+    catch:'<strong>The catch:</strong> In panic conditions, the contraction mechanism — burning coins while confidence is already collapsing — can actively accelerate the downward spiral it was designed to reverse. Terra/LUNA used exactly this mechanism. The elastic supply worked perfectly. The confidence collapse it couldn\'t handle was the problem.'
+  },
+};
+
+const COMBOS = [
+  { req:['meme','utility'], head:'The meme-to-utility pipeline.', body:'Shiba Inu executed this exact playbook: started as a pure Dogecoin clone, then shipped ShibaSwap (a DeFi exchange), a metaverse layer, and its own blockchain. Hype bootstraps the community; community builds the product. Very few meme coins successfully execute this transition. Most just bolt a two-page PDF roadmap onto a dog coin and disappear six months later.', ex:'Shiba Inu (SHIB), Floki Inu (FLOKI)' },
+  { req:['defi','governance'], head:'The DeFi governance standard.', body:'This is the canonical combo in DeFi. Use the token to access the protocol, earn a share of protocol fees by holding it, and vote on its future parameters with it. Clean, aligned incentives that make users into stakeholders. Nearly every major DeFi protocol — Uniswap, Compound, Aave, Curve — operates on exactly this model.', ex:'Uniswap (UNI), Compound (COMP), Aave (AAVE), Curve (CRV)' },
+  { req:['utility','governance'], head:'The integrated protocol token.', body:'Use the platform, hold the token, vote on the platform\'s future. Users become stakeholders with a genuine say in how the protocol evolves. When it works, the incentive alignment is beautiful — the people who use the system most are the people most motivated to govern it well.', ex:'MakerDAO (MKR), Synthetix (SNX), Nexus Mutual (NXM)' },
+  { req:['stable','defi'], head:'The MakerDAO model.', body:'A DeFi protocol that issues its own stablecoin. Possibly the most sophisticated — and most studied — tokenomic design in all of DeFi. MakerDAO has been running DAI on this model since 2017, surviving multiple 80%+ market crashes, a global pandemic, and a regulatory crackdown. It remains the gold standard for how DeFi and stablecoins can coexist.', ex:'MakerDAO / DAI, Liquity (LUSD), Frax (FRAX)' },
+  { req:['meme','defi'], head:'Hype with infrastructure.', body:'Launch a DeFi ecosystem on top of a meme coin and, if the community is large enough, the liquidity pools can be enormous. ShibaSwap briefly reached $1 billion in total value locked on the strength of the SHIB community alone. The question that always follows: does anything real get built when the hype cycle inevitably ends?', ex:'Shiba Inu / ShibaSwap, various meme-DeFi experiments' },
+  { req:['payment','stable'], head:'Digital dollars for real payments.', body:'This combination is genuinely displacing traditional remittances in some corridors. USDC running on Solana settles in under a second for fractions of a cent. In markets with weak banking infrastructure, this is a real improvement to people\'s financial lives — not just speculation. It\'s competing with Western Union in ways that Bitcoin never quite managed.', ex:'USDC, Tether (USDT), PayPal USD (PYUSD)' },
+  { req:['store','utility'], head:'Gold that does something.', body:'A coin that\'s both scarce digital gold and has genuine on-chain utility is a genuinely compelling combination. Ethereum has attempted to occupy this space — ETH as the "ultra-sound money" that you also need to use the world\'s largest smart contract platform. Whether it fully achieves both is one of the most debated questions in the space.', ex:'ETH (contested), BTC used as DeFi collateral' },
+];
+
+const TENSIONS = [
+  { pair:['meme','store'], msg:'Meme coin + Store of Value are philosophically at war. One lives on hype cycles and short-term speculation; the other needs decade-long credibility and steady institutional accumulation. Dogecoin has been attempting to reconcile this tension since 2013. It has not fully succeeded.' },
+  { pair:['meme','stable'], msg:'A meme coin pegged to $1 is just the dollar with extra steps. The entire appeal of a meme coin is speculative upside and price volatility — take that away and you\'ve got a very expensive payment system with a dog logo.' },
+];
+
+/* ─── RESULT LOGIC ─── */
+function getKeys() {
+  return [...answers.purpose].map(p => p === 'stable' && answers.stable ? 'stable-'+answers.stable : p);
+}
+function getRisk() {
+  const p = answers.purpose, st = answers.stable;
+  if (st === 'algo') return { txt:'Extreme', c:'#C0392B' };
+  if (p.has('meme') && p.has('defi')) return { txt:'Very High', c:'#D04A00' };
+  if (p.has('meme') || p.has('defi')) return { txt:'High', c:'#B07000' };
+  if (st === 'fiat') return { txt:'Low', c:'#1A7A4A' };
+  if (st === 'crypto') return { txt:'Medium', c:'#1A56A0' };
+  return { txt:'Medium', c:'#1A56A0' };
+}
+function getVol() {
+  const map = { utility:55, meme:95, governance:65, store:60, defi:75, payment:50 };
+  const sm = { fiat:4, crypto:15, algo:80 };
+  let v=0, n=0;
+  answers.purpose.forEach(k => { if (k!=='stable'&&map[k]) { v+=map[k]; n++; } });
+  if (answers.stable && sm[answers.stable]!==undefined) { v+=sm[answers.stable]*2; n+=2; }
+  return n ? Math.round(v/n) : 50;
+}
+function buildVerdict() {
+  const p = answers.purpose, st = answers.stable;
+  if (st==='algo'&&p.has('defi')) return 'Congratulations — you\'ve recreated Terra/LUNA. The DeFi yield attracted capital into the stablecoin, which propped up the protocol\'s TVL, which justified the yield, which attracted more capital. A beautiful self-reinforcing loop. Until confidence broke, and it became an equally efficient self-destroying one — $40 billion gone in 72 hours. Genuinely one of the most instructive combinations you could have designed.';
+  if (p.has('meme')&&p.has('utility')&&p.has('defi')) return 'The Shiba Inu triple: meme energy, real utility, and DeFi infrastructure. It sounds deranged because it started as a joke. Then the community got serious, shipped real products, and the joke became a multi-billion dollar ecosystem with its own blockchain. A legitimate path — it just requires an unusually large, unusually committed community and a team that actually delivers.';
+  if (p.size===1&&p.has('meme')) return 'A pure meme coin. Genuine respect for the honesty — no pretending to be something it\'s not. Just vibes, a community, and collective hope that number goes up. Dogecoin has been doing exactly this since 2013 and remains worth billions. The power of a good dog should never be underestimated.';
+  if (p.size===1&&p.has('stable')) return 'A pure stablecoin. The most boring type of crypto — and arguably the most important. No moon, no lambos, no 100x. Just reliable, predictable, and useful infrastructure. The Toyota Corolla of the digital economy: mocked endlessly, runs forever, quietly powers everything else.';
+  if (p.size===1) return 'A pure play — rare in the wild, and either a sign of genuine clarity or a sign the whitepaper is only two pages long. At least everyone knows exactly what they\'re buying. Simplicity is underrated in a space full of coins trying to do six things and achieving none of them.';
+  if (p.size===2) return 'A focused hybrid. Two complementary features, a clear identity, and something coherent to put in the whitepaper. The best coins in each category tend to do two things very well rather than six things adequately. Good design often looks like restraint.';
+  return `A ${p.size}-feature coin. That's ${p.size} communities to serve, ${p.size} technical systems to maintain, and one very long whitepaper. Multi-feature coins can have more resilient demand — if utility dips, community holds. But they're significantly harder to execute, and "we do everything" is often a polite way of saying "we've thought carefully about nothing."`;
+}
+function getTagColor(k) {
+  const m = { utility:'#1A56A0', meme:'#C0392B', governance:'#6B3FA0', store:'#B05A00', defi:'#1A7A4A', payment:'#1A7A4A', 'stable-fiat':'#1A7A4A', 'stable-crypto':'#1A56A0', 'stable-algo':'#C0392B' };
+  return m[k]||'#444';
+}
+function getExamples(keys) {
+  const ex = { 'stable-algo':'Terra/LUNA (💀 2022), Iron Finance (💀 2021)', 'stable-fiat':'USDC (Circle), Tether (USDT), PayPal USD', 'stable-crypto':'DAI (MakerDAO), LUSD (Liquity)', meme:'Dogecoin (DOGE), Shiba Inu (SHIB), Pepe (PEPE)', defi:'Aave (AAVE), Uniswap (UNI), Curve (CRV)', governance:'MakerDAO (MKR), Compound (COMP)', store:'Bitcoin (BTC), Litecoin (LTC)', utility:'Filecoin (FIL), Chainlink (LINK), BAT', payment:'XRP (Ripple), Stellar (XLM), Nano' };
+  const seen=new Set(), out=[];
+  keys.forEach(k => { if(ex[k]&&!seen.has(ex[k])) { seen.add(ex[k]); out.push(ex[k]); } });
+  return out.slice(0,4).join('  ·  ') || 'A genuinely novel combination. Possibly brilliant. Possibly incoherent. Only time (and the market) will tell.';
+}
+
+const CONTROL_DATA = {
+  company:  { icon:'🏢', label:'Company-Controlled', c:'#444', bg:'#F4F4F0', cb:'#E4E4DC', body:'One organisation makes all the calls. Efficient, fast, and clear about who\'s responsible. It\'s also precisely the centralised model that crypto was invented to replace — a single point of trust, and a single point of failure. If the company gets hacked, regulated out of existence, or simply makes a catastrophic decision, the entire coin bears the consequences.', catch:'<strong>The catch:</strong> Centralised control is efficient right up until it isn\'t. Regulatory pressure, leadership changes, or a single bad actor inside the organisation can reshape or destroy the coin overnight.' },
+  dao:      { icon:'🌐', label:'DAO-Governed', c:'#6B3FA0', bg:'#F2EAFB', cb:'#E0D0F8', body:'All major decisions go to a token-holder vote. In theory, genuine decentralised democracy — no CEO, no board, just the community. In practice, average voter participation in major DAO proposals sits below 10%, and wallet concentration means a handful of large holders can usually outvote the rest of the community combined.', catch:'<strong>The catch:</strong> Governance attacks — where a bad actor acquires enough tokens to pass a malicious proposal — have actually happened. In 2023, a single entity briefly gained control of Tornado Cash\'s governance. DAOs are only as decentralised as their token distribution.' },
+  founders: { icon:'👤', label:'Founder-Controlled (for now)', c:'#B05A00', bg:'#FDF0E0', cb:'#FAE0C0', body:'A small founding team runs things with a promise to progressively decentralise as the project matures. This is genuinely common and often sensible in early-stage projects — pure DAO governance from day one tends to be chaotic. The phrase "sufficiently decentralised" has done an extraordinary amount of heavy lifting in regulatory discussions.', catch:'<strong>The catch:</strong> "Progressive decentralisation" has been used as a holding pattern by projects that never actually decentralised. If the founders hold most of the tokens and most of the power, the decentralisation is largely cosmetic.' },
+  nobody:   { icon:'🤖', label:'Autonomous (Smart Contracts Only)', c:'#1A7A4A', bg:'#E8F8F0', cb:'#C8F0D8', body:'The protocol runs entirely on smart contracts with no human override possible. Rules are set at deployment and the code is immutable. Maximum trustlessness — nobody can change the rules after the fact, rug-pull, or quietly redirect funds. Users interact directly with the contract, knowing exactly what it does.', catch:'<strong>The catch:</strong> Immutability cuts both ways. If there\'s a critical bug in the contract, nobody can patch it. Millions of dollars have been permanently lost to smart contract vulnerabilities in protocols with no upgrade mechanism. "The code is the law" is reassuring right up until the law has a bug.' },
+};
+
+function buildStory(name) {
+  const p = answers.purpose;
+  const st = answers.stable;
+  const sup = answers.supply;
+  const ctrl = answers.control;
+  const ticker = name.replace(/\s+/g,'').substring(0,4).toUpperCase();
+
+  // Each scenario: { headline, events:[{time,text}], finale }
+  let scenario;
+
+  // ── SPECIFIC HIGH-PRIORITY COMBOS ──
+
+  if (st === 'algo' && p.has('defi')) {
+    scenario = {
+      headline: `${name} loses $40 billion in a weekend`,
+      events: [
+        { time: 'Month 1', text: `Launch day. The ${ticker} whitepaper promises "an algorithmic stablecoin backed by the protocol itself." Nobody asks what that means exactly. It goes up <strong>800% in a week</strong>.` },
+        { time: 'Month 4', text: `Your DeFi arm is offering <strong>19.5% APY</strong> on ${ticker} deposits. Analysts call it "unsustainable." Your community calls those analysts "have-nots." Everyone piles in.` },
+        { time: 'Month 8', text: `A large wallet starts selling. The peg slips to $0.98. The algorithm mints more ${ticker} to defend the peg. This makes the selling worse. <strong>Classic death spiral.</strong> The algorithm is doing exactly what it was designed to do.` },
+        { time: 'Month 8, Day 3', text: `$40 billion in value evaporates in 72 hours. Your Discord goes from 200,000 members to 12 people arguing about who to blame. The founders' wallets, it later emerges, were <strong>emptied hours before the collapse</strong>. Funny that.` },
+        { time: 'Month 9', text: `South Korean prosecutors issue an arrest warrant. The founder is found in Montenegro. <em>Inspired by actual events involving Do Kwon, Terra/LUNA, May 2022.</em>` },
+      ],
+      finale: `The <strong>educational lesson</strong>: algorithmic stablecoins work on confidence. Confidence is not a collateral mechanism. When it goes, there is nothing to stop the fall — the algorithm actively makes it worse. Terra/LUNA was not a black swan. Multiple people predicted exactly this failure mode in public, years before it happened.`
+    };
+
+  } else if (p.has('meme') && p.has('utility') && p.has('defi')) {
+    scenario = {
+      headline: `${name} starts as a joke. The joke raises $3 billion.`,
+      events: [
+        { time: 'Week 1', text: `You launch ${name} with a cartoon mascot and no product. The community names themselves the "${ticker} Army." Elon Musk tweets a vaguely relevant meme. <strong>Price up 4,000%.</strong> Journalists describe it as "a cultural moment."` },
+        { time: 'Month 3', text: `The team announces a roadmap. Real developers are hired. A DEX called ${ticker}Swap goes live. <strong>Total Value Locked hits $800 million</strong> in the first week on community hype alone.` },
+        { time: 'Month 7', text: `${ticker}Swap gets exploited for <strong>$14 million</strong> due to a reentrancy bug in the liquidity pool contract. The team patches it in 48 hours and reimburses victims from the treasury. Respect is grudgingly given.` },
+        { time: 'Year 2', text: `Your own layer-2 blockchain launches. The mascot now has a <strong>lore-based backstory</strong> and three separate comic book series. The Discord has 1.4 million members. The product is real. The vibes remain immaculate.` },
+        { time: 'Year 3', text: `The broader market crashes 70%. ${name} drops 85% from its peak. The meme coin energy fades. <strong>The DeFi TVL holds</strong>, though, because some users are actually using the product now. It survives. Barely.` },
+      ],
+      finale: `The template — meme community bootstraps a real ecosystem — is legitimate. <strong>Shiba Inu proved it.</strong> The question is always whether the team can keep shipping after the hype fades. Most can't. Some do. The difference is usually whether the founders were in it for the culture or the exit.`
+    };
+
+  } else if (p.has('meme') && !p.has('utility') && !p.has('defi') && ctrl === 'founders') {
+    scenario = {
+      headline: `${name} rugs. The founders buy Porsches.`,
+      events: [
+        { time: 'Day 1', text: `${name} launches with a website that took 45 minutes to make and a Telegram group of 12 people, three of whom are the founders under different names. <strong>The mascot is a poorly drawn version of an existing meme coin mascot.</strong>` },
+        { time: 'Day 3', text: `A TikTok influencer (17 years old, 800K followers) posts about ${ticker}. Their disclosure is technically present but <strong>in grey text on a white background</strong>. Volume spikes 40,000%. Price up 600%.` },
+        { time: 'Day 4', text: `The founders, who retained <strong>40% of the supply</strong> "for ecosystem development," begin selling. This is disclosed in the whitepaper on page 14 in a footnote. The sell pressure is described by the team as "market makers adjusting." ` },
+        { time: 'Day 5', text: `<strong>Price down 97%.</strong> The Telegram group still has 40,000 members, now mostly composed of people threatening legal action and people selling courses on "how to survive a rug pull."` },
+        { time: 'Day 30', text: `The founders launch a new coin. <em>Based on the documented behaviour of approximately 73% of meme coins launched between 2021 and 2023.</em>` },
+      ],
+      finale: `The <strong>key red flag</strong>: founders retaining a large supply "for the ecosystem" with no vesting schedule is the oldest trick in the book. It's not even hidden — it's in the whitepaper. But nobody reads the whitepaper. Lesson: read the tokenomics section. Specifically the bit about who owns what and when they can sell it.`
+    };
+
+  } else if (p.has('meme') && !p.has('utility') && !p.has('defi')) {
+    scenario = {
+      headline: `${name} goes up 11,000%. Then it doesn't.`,
+      events: [
+        { time: 'Week 1', text: `${name} launches with no utility, no roadmap, and <strong>a lot of energy</strong>. The community is called the "${ticker}iverse." Someone makes a song. It has 2 million plays.` },
+        { time: 'Month 2', text: `A celebrity tweets "${ticker} to the moon 🚀🐕" ironically. The market does not understand irony. <strong>Market cap hits $2 billion</strong>. Financial journalists write the "is this the future of money" piece for the fourth time this cycle.` },
+        { time: 'Month 5', text: `The celebrity clarifies they were joking. <strong>Price drops 60% in six hours.</strong> The community accuses them of market manipulation. They were definitely joking.` },
+        { time: 'Month 9', text: `Price has recovered to about <strong>40% of peak</strong>. The core community — 50,000 true believers — remains extremely online. Someone is selling ${ticker}-branded hoodies. They are not profitable.` },
+        { time: 'Year 2', text: `The broader market enters a bear. ${ticker} drops 94% from peak. <strong>Volume drops to near zero.</strong> The Discord is quiet now. Just 200 people, talking to each other. It's actually quite wholesome.` },
+      ],
+      finale: `This is <strong>the Dogecoin story</strong>, more or less, except Dogecoin somehow survived long enough to become infrastructure. Most meme coins don't make it to year two. The ones that do usually have one thing Dogecoin had: a genuinely good community that doesn't leave when the price drops. That's rarer than it sounds.`
+    };
+
+  } else if (st === 'fiat' && ctrl === 'company' && p.has('payment')) {
+    scenario = {
+      headline: `${name} becomes boring and powerful. In that order.`,
+      events: [
+        { time: 'Month 1', text: `${name} launches. The press release is <strong>extremely professional</strong>. There is no mascot. The founders have LinkedIn profiles. Everyone in crypto says it "misses the point."` },
+        { time: 'Month 6', text: `A major remittance corridor — Philippines to UAE — switches to ${ticker} for settlement. <strong>Transfer fees drop from 6% to 0.1%.</strong> Nobody writes about this because it is not very exciting.` },
+        { time: 'Year 1', text: `A regulator sends a letter asking for clarification on your reserve structure. You provide it. <strong>Audit completed. All reserves confirmed.</strong> Nothing exciting happens. This is the goal.` },
+        { time: 'Year 2', text: `A competitor algorithmic stablecoin collapses spectacularly, wiping out $40 billion. ${name} <strong>gains $8 billion in new deposits in 72 hours</strong> as people flee to something boring and safe.` },
+        { time: 'Year 3', text: `${name} processes more daily volume than <strong>Western Union's entire global network</strong>. Nobody who uses it knows it's a cryptocurrency. They think it's just a fast way to send money. That was always the plan.` },
+      ],
+      finale: `The <strong>insight</strong>: the most successful stablecoins are the ones you forget are crypto. USDC, Tether, PayPal USD — they succeeded not by being exciting but by being reliably, boringly useful at scale. The crypto community largely ignored them. The people actually using them largely didn't care what blockchain they were on. Infrastructure wins by being invisible.`
+    };
+
+  } else if (st === 'crypto' && p.has('defi')) {
+    scenario = {
+      headline: `${name} survives three crashes and becomes unsexy infrastructure.`,
+      events: [
+        { time: 'Month 1', text: `${name} launches. The mechanism — <strong>over-collateralised crypto backing a stable token</strong> — requires a 47-page whitepaper to explain properly. Crypto Twitter calls it "too complicated." It is too complicated. It works anyway.` },
+        { time: 'Month 8', text: `Ethereum drops 55% in two weeks. ${ticker}'s collateral ratios come under pressure. <strong>$340 million in positions are liquidated</strong> in 18 hours. The peg holds. The mechanism works exactly as designed. The team posts a 4,000-word post-mortem anyway.` },
+        { time: 'Year 1', text: `A DAO governance vote changes the minimum collateral ratio. <strong>Turnout: 4.2% of token holders.</strong> The same 200 addresses that always vote, vote. The change passes. This is considered healthy governance by DeFi standards.` },
+        { time: 'Year 2', text: `Another crash. Bigger this time. ${ticker} depegs slightly to <strong>$0.97 for six hours</strong>. Then repegs. The community acts like this is a catastrophe. Compared to the algo stablecoins that lost everything, it is a mild Tuesday.` },
+        { time: 'Year 3', text: `${name} is quietly used as collateral in <strong>14 other DeFi protocols</strong>. Most users of those protocols have never heard of ${name}. It is infrastructure now. The founders mostly post about governance parameters.` },
+      ],
+      finale: `The <strong>MakerDAO model</strong> — DAI has been running since 2017 — is the proof of concept that this can work at scale through real market stress. It's not glamorous. The governance forums are dense. The risk parameters are arcane. And it has genuinely kept a dollar peg through conditions that destroyed every algorithmic alternative. Sometimes the boring answer is the right answer.`
+    };
+
+  } else if (p.has('defi') && p.has('governance') && !p.has('meme')) {
+    scenario = {
+      headline: `${name} governs itself into several interesting arguments.`,
+      events: [
+        { time: 'Launch', text: `${name} goes live. The protocol works. Token holders get governance rights and a share of fees. <strong>Total Value Locked hits $200 million in 60 days.</strong> A VC firm writes a blog post calling it "the future of finance." Customary.` },
+        { time: 'Month 3', text: `First governance vote: should the protocol fee be 0.2% or 0.3%? <strong>Turnout: 6.4%.</strong> The top three wallets — all VCs from the Series A — vote together and carry the result. The community calls this "a learning experience."` },
+        { time: 'Month 7', text: `A governance attack is attempted. An unknown entity borrows <strong>$400 million in flash loans</strong>, votes on a treasury proposal, and tries to drain it. The attack fails because the protocol has a time-lock. The team spends two weeks updating the governance module.` },
+        { time: 'Year 1', text: `The protocol generates <strong>$18 million in annual fees</strong>. A proposal to distribute these to token holders passes. Another proposal to use them for "ecosystem development" (read: team salaries) also passes, two months later, with slightly lower turnout.` },
+        { time: 'Year 2', text: `Uniswap announces a similar feature. <strong>${name}'s TVL drops 35%</strong> in a week. A governance vote is called on whether to pivot, merge, or "stay the course." Turnout: 12%. Highest ever. Crisis is clarifying.` },
+      ],
+      finale: `The <strong>honest truth about DeFi governance</strong>: the protocols that survive long-term are the ones where a small, competent, aligned group makes most of the real decisions — and the token voting provides legitimacy and a safety valve rather than day-to-day management. Pure DAO governance at scale is a beautiful theory. In practice, Compound, Uniswap, and Aave all have core teams who do the actual work. The community votes on the big stuff. That's probably the right balance.`
+    };
+
+  } else if (p.has('store') && sup === 'fixed' && !p.has('meme')) {
+    scenario = {
+      headline: `${name} spends a decade being obviously wrong, then obviously right.`,
+      events: [
+        { time: 'Year 1', text: `${name} launches with a fixed supply of 21 million coins and no central authority. <strong>Price: $0.003.</strong> A prominent economist writes an op-ed explaining why it will definitely fail. The op-ed is later used as a "they said the same about Bitcoin" meme approximately 40,000 times.` },
+        { time: 'Year 2', text: `Silk Road starts using ${ticker} for transactions. This is <strong>not great PR</strong>. The mainstream press writes about it extensively. The price goes up anyway, which is confusing for everyone.` },
+        { time: 'Year 4', text: `Price hits <strong>$1,000</strong>. Then drops 80%. Then hits $1,000 again. A pattern begins to emerge. Macro investors write papers about whether this is a bubble. The papers are still being cited. The debate remains unresolved.` },
+        { time: 'Year 8', text: `A major bank announces it is holding <strong>${ticker} as a treasury asset</strong>. The same bank that, three years ago, called it "rat poison." The CFO does not address the discrepancy publicly.` },
+        { time: 'Year 10', text: `ETF approved. <strong>$15 billion inflows in 30 days.</strong> The op-ed economist has not updated their position. The fixed supply hasn't changed. 21 million coins, forever. Exactly as designed.` },
+      ],
+      finale: `The <strong>Bitcoin lesson</strong> — because let's be honest, this is the Bitcoin story — is that store-of-value assets win through time, not through features. Every year it doesn't collapse is a year of accumulated credibility. The fixed supply, which seemed arbitrary in 2009, looks increasingly deliberate in hindsight. Scarcity is easy to understand. Easy-to-understand assets attract capital. Eventually.`
+    };
+
+  } else if (ctrl === 'nobody' && p.has('defi')) {
+    scenario = {
+      headline: `${name} gets exploited for $68 million. Nobody can fix it.`,
+      events: [
+        { time: 'Launch', text: `${name} deploys its smart contracts. No admin keys. No upgrade function. No multisig. <strong>Pure, immutable code.</strong> The team is proud of this. "We can't rug you even if we wanted to," the launch post reads. This is true.` },
+        { time: 'Month 4', text: `TVL reaches <strong>$200 million</strong>. Three audits completed. All clear. The team is confident. The community is proud. A researcher on Twitter posts a thread about a theoretical oracle manipulation vector. It gets 200 likes.` },
+        { time: 'Month 6', text: `At 3:14am UTC, a bot executes a flash loan attack exploiting exactly the oracle vulnerability from the Twitter thread. <strong>$68 million drained in 13 transactions.</strong> The attack takes 47 seconds.` },
+        { time: 'Month 6, 9am', text: `The team announces they cannot fix the contract because it is immutable. This is technically correct. <strong>A new contract is deployed.</strong> Users are asked to migrate. $41 million migrates. $27 million stays in the old contract, technically owned by the attacker, who has not moved it.` },
+        { time: 'Year 1', text: `The attacker eventually returns <strong>$18 million</strong> — apparently satisfied with $49 million and not wanting the legal heat. An on-chain message is sent offering a "whitehat bounty" retroactively. The industry debates whether this counts as a success.` },
+      ],
+      finale: `The <strong>immutability paradox</strong>: the property that makes autonomous protocols trustworthy — nobody can change the rules — is the same property that makes them unfixable when the rules have bugs. Euler Finance, Poly Network, Ronin Bridge — all exploited for nine figures, all with no recourse. The solutions (upgrade proxies, governance, multisig) all reintroduce some human control. There is no free lunch. There is only choosing which trade-off you can live with.`
+    };
+
+  } else if (ctrl === 'dao' && p.has('governance')) {
+    scenario = {
+      headline: `${name} is governed by its community. This goes about as well as you'd expect.`,
+      events: [
+        { time: 'Month 1', text: `First governance proposal: change the protocol fee from 0.25% to 0.30%. <strong>Turnout: 3.1%.</strong> One wallet — "GoldVault.eth" — votes against with 18% of supply. Proposal fails. GoldVault.eth has been in the top 5 wallets since the pre-sale.` },
+        { time: 'Month 4', text: `A community member submits a proposal to <strong>fund a "community growth initiative"</strong> — essentially, pay themselves $40K/month in ${ticker} to post on social media. It passes with 71% in favour. Turnout: 4.8%. The 14 people who voted were mostly the proposer's friends.` },
+        { time: 'Month 8', text: `A hostile governance attack is attempted. A VC acquires <strong>22% of circulating supply</strong> over two weeks, then submits a proposal to redirect treasury funds to a wallet they control. The community mobilises. Turnout for this vote: <strong>61%</strong>. Attack defeated. Crisis is the best governance tool.` },
+        { time: 'Year 1', text: `After the attack, a "governance reform" proposal passes, introducing a time-lock, quorum requirements, and a "guardian" multisig that can veto malicious proposals. <strong>The DAO now has a committee that oversees the DAO.</strong> The irony is noted.` },
+        { time: 'Year 2', text: `Voting participation stabilises at around <strong>8%</strong>. The same 300 addresses vote on everything. They are mostly well-intentioned. The protocol works fine. The community writes manifestos about decentralisation on X. Governance grinds on.` },
+      ],
+      finale: `The <strong>dirty secret of DAO governance</strong>: it mostly works because a small group of engaged, competent people does the actual work, and the token voting provides legitimacy to their decisions. This is not too different from how most organisations work. The difference is the illusion — and occasionally the reality — of broader democratic accountability. Compound, Uniswap, and Aave have all landed here. It's messy but functional. Usually.`
+    };
+
+  } else if (p.has('utility') && ctrl === 'company' && !p.has('meme')) {
+    scenario = {
+      headline: `${name} files for an IPO. The SEC sends a letter. Things get complicated.`,
+      events: [
+        { time: 'Month 1', text: `${name} launches. The company has <strong>real engineers, a real product</strong>, and a token that people actually need to use the platform. The crypto community is suspicious. "Too corporate," they say. They're not wrong.` },
+        { time: 'Month 6', text: `Platform usage grows. The token's value rises because <strong>demand is genuinely tied to usage</strong>. This is novel. A16Z writes a blog post. The team does a podcast circuit. Everyone wears smart-casual.` },
+        { time: 'Year 1', text: `The SEC sends a letter asking whether ${ticker} is a security. The company's lawyers say no. The SEC's lawyers say maybe. <strong>This conversation will take three years to resolve</strong> and cost $40 million in legal fees regardless of outcome.` },
+        { time: 'Year 2', text: `Ripple had this argument too. It cost them <strong>six years and $200 million</strong>. The company presses on. The token continues to function. The legal team gets a new wing on the office.` },
+        { time: 'Year 3', text: `Regulatory clarity improves marginally. ${name} files for a public listing. The S-1 mentions "token" 847 times and "risk factor" 219 times. <strong>IPO prices above range.</strong> The SEC letter is still pending.` },
+      ],
+      finale: `The <strong>utility token regulatory problem</strong>: if your token has genuine utility and your company is centralised, every regulator in the world wants to know if it's an unregistered security. Ripple (XRP) has been fighting this since 2020. Coinbase has been sued. The legal landscape is clearer than it was in 2017, but not by as much as anyone would like. Running a real company with a real token is the most legitimate version of crypto — and somehow also the most legally complicated one.`
+    };
+
+  } else if (p.has('payment') && !p.has('stable')) {
+    scenario = {
+      headline: `${name} is accepted at a coffee shop in El Salvador and approximately nowhere else.`,
+      events: [
+        { time: 'Launch', text: `${name} launches promising <strong>"Visa speeds, crypto ethos."</strong> The whitepaper has a section called "The Future of Money." It has been used in 11 other whitepapers, almost verbatim, since 2017.` },
+        { time: 'Month 3', text: `A coffee shop in San Salvador announces it accepts ${ticker}. The PR team photographs this extensively. <strong>The coffee shop also accepts 14 other payment coins</strong> and is largely doing it for the press. The coffee is reportedly good.` },
+        { time: 'Month 8', text: `Volatility event. ${ticker} drops 40% in a week. <strong>Everyone who used it for payments</strong> either made or lost significant money on their morning coffee in retrospect. Merchants quietly re-enable their USD option.` },
+        { time: 'Year 1', text: `A competitor releases <strong>faster transaction speeds</strong>. Another releases lower fees. The payment coin space now has 340 entrants. The barista in San Salvador processes approximately <strong>2.3 ${ticker} transactions per day</strong>.` },
+        { time: 'Year 2', text: `Stablecoins eating the use case becomes undeniable. Why use volatile ${ticker} for payments when you can use something that's actually worth $1 tomorrow? <strong>The pivot-to-DeFi whitepaper is quietly drafted.</strong>` },
+      ],
+      finale: `The <strong>payment coin problem</strong>: for money to work as a medium of exchange, it needs to be stable enough that you're not gambling on your morning coffee. Bitcoin, for all its virtues, has never really solved this. XRP has. Stellar has. USDC has. The ones that won the payments use case are either extremely fast and cheap (XRP, Stellar) or just pegged to a dollar (USDC). Volatility and payments are fundamentally incompatible.`
+    };
+
+  } else {
+    // Generic fallback with variations based on supply/control
+    const genericScenarios = [
+      {
+        headline: `${name} has a perfectly normal three years. For crypto.`,
+        events: [
+          { time: 'Month 1', text: `${name} launches. <strong>Price up 300% in a week.</strong> This is considered a subdued launch. The team celebrates with a Zoom call.` },
+          { time: 'Month 4', text: `A popular crypto YouTuber covers ${name}. His audience is 2.4 million people. His last three coin recommendations lost <strong>85%, 91%, and 67%</strong> respectively. ${name} goes up 180% in 48 hours.` },
+          { time: 'Month 9', text: `The bull market ends. ${name} drops <strong>78% from peak.</strong> This is called a "market correction." The core team keeps building. Most of the Month 4 buyers have left.` },
+          { time: 'Year 2', text: `V2 launches. It works better than V1. <strong>TVL recovers to 60% of peak.</strong> The team has stopped counting price and started counting users. This is a sign of either maturity or denial, depending on the week.` },
+          { time: 'Year 3', text: `The next bull market starts. ${name} goes up <strong>12x from the bear market low.</strong> New people discover it. They think they found it. The people who held through the bear market feel quietly smug. They are entitled to this.` },
+        ],
+        finale: `The <strong>boring truth</strong> about most surviving crypto projects: they follow an almost identical pattern. Hype → crash → building in the dark → next cycle hype. The ones that survive are the ones where the team kept shipping during the quiet years. ${name} survived. Plenty didn't.`
+      },
+      {
+        headline: `${name} gets listed on Binance. Everything changes and nothing changes.`,
+        events: [
+          { time: 'Month 2', text: `${name} is listed on a mid-tier exchange. <strong>Volume: $400K/day.</strong> The community considers this a triumph. The founders' parents have been told about it.` },
+          { time: 'Month 5', text: `Binance listing announced. Price <strong>up 600% in 12 hours.</strong> The phrase "wen Binance" was asked approximately 4,000 times in Discord prior to this announcement. The phrase is now banned in Discord as a precaution.` },
+          { time: 'Month 6', text: `<strong>Post-listing dump.</strong> This always happens. Every coin. Always. Someone on Reddit calls this "the Binance effect." The team calls it "organic market correction." Both are describing the same thing.` },
+          { time: 'Year 1', text: `Daily volume stabilises at <strong>$12 million</strong>. The project has real liquidity now. Institutional traders start paying attention. The community is proud and slightly nervous about what institutional traders typically do.` },
+          { time: 'Year 2', text: `A small hedge fund takes a large position. They are bullish on the fundamentals. They are also, simultaneously, <strong>writing covered calls against their position</strong>. The community does not know this. This is legal.` },
+        ],
+        finale: `The <strong>exchange listing lesson</strong>: getting listed on a major exchange is a milestone, not a destination. The short-term price action is almost always the same — spike, dump, stabilise. What matters is whether the fundamentals justify the valuation after the dust settles. In most cases: not yet. In some cases: yes. In a few cases: eventually, yes, massively.`
+      }
+    ];
+    scenario = genericScenarios[Math.floor(Math.random() * genericScenarios.length)];
+  }
+
+  return scenario;
+}
+
+function renderOutcome(name) {
+  const scenario = buildStory(name);
+  if (!scenario) { document.getElementById('r-outcome').innerHTML = ''; return; }
+
+  const timelineHTML = scenario.events.map((e, i) => `
+    <div class="outcome-event">
+      <div class="outcome-dot-col">
+        <div class="outcome-dot"></div>
+        ${i < scenario.events.length - 1 ? '<div class="outcome-dot-line"></div>' : ''}
+      </div>
+      <div class="outcome-event-content">
+        <div class="outcome-event-time">${e.time}</div>
+        <div class="outcome-event-text">${e.text}</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('r-outcome').innerHTML = `
+    <div class="outcome-card">
+      <div class="outcome-header">
+        <span class="outcome-header-icon">📰</span>
+        <span class="outcome-header-label">What happened with ${name}</span>
+        <span class="outcome-header-sub">Speculative history</span>
+      </div>
+      <div class="outcome-body">
+        <div class="outcome-headline">${scenario.headline}</div>
+        <div class="outcome-timeline">${timelineHTML}</div>
+        <div class="outcome-finale">${scenario.finale}</div>
+      </div>
+    </div>
+  `;
+}
+
+function showResult() {
+  const name = getFinalName();
+  if (!name) { document.getElementById('warn-5').style.display='block'; return; }
+  const ticker = name.replace(/\s+/g,'').substring(0,6).toUpperCase();
+  const keys = getKeys();
+  const risk = getRisk();
+  const vol = getVol();
+  const stars = vol>=80?'★★★★★':vol>=60?'★★★★':vol>=40?'★★★':vol>=15?'★★':'★';
+
+  document.getElementById('r-name').textContent = name;
+  document.getElementById('r-sub').textContent = `$${ticker}  ·  ${answers.purpose.size>1?'hybrid coin':'pure play'}`;
+
+  document.getElementById('r-tags').innerHTML = keys.map(k => {
+    const d=T[k]; if(!d) return '';
+    const c=getTagColor(k);
+    return `<span class="type-tag" style="color:${c};border-color:${c};background:${c}18;">${d.icon} ${d.label}</span>`;
+  }).join('');
+
+  document.getElementById('r-stats').innerHTML = `
+    <div class="rstat"><div class="rstat-label">Risk</div><div class="rstat-val" style="color:${risk.c};font-size:15px;">${risk.txt}</div></div>
+    <div class="rstat"><div class="rstat-label">Volatility</div><div class="rstat-val">${vol}/100</div><div class="vol-bg"><div class="vol-fill" id="vfill" style="width:0%"></div></div></div>
+    <div class="rstat"><div class="rstat-label">Vibe</div><div class="rstat-val" style="font-size:13px;">${stars}</div></div>
+    <div class="rstat"><div class="rstat-label">Features</div><div class="rstat-val">${answers.purpose.size}</div></div>
+  `;
+
+  document.getElementById('r-verdict').textContent = buildVerdict();
+
+  const supKey = 'sup_' + answers.supply;
+  const ctrlData = answers.control ? CONTROL_DATA[answers.control] : null;
+  const supData = T[supKey];
+
+  document.getElementById('r-breakdown').innerHTML = [
+    ...keys.map(k => {
+      const d=T[k]; if(!d) return '';
+      return `<div class="bcard" style="background:${d.bg};border-left-color:${d.c};">
+        <div class="bcard-head" style="color:${d.c};">${d.icon} ${d.label}</div>
+        <div class="bcard-body">${d.body}</div>
+        <div class="bcard-catch" style="background:${d.cb};border-color:${d.c};color:#333;">${d.catch}</div>
+      </div>`;
+    }),
+    supData ? `<div class="bcard" style="background:${supData.bg};border-left-color:${supData.c};">
+      <div class="bcard-head" style="color:${supData.c};">${supData.icon} ${supData.label}</div>
+      <div class="bcard-body">${supData.body}</div>
+      <div class="bcard-catch" style="background:${supData.cb};border-color:${supData.c};color:#333;">${supData.catch}</div>
+    </div>` : '',
+    ctrlData ? `<div class="bcard" style="background:${ctrlData.bg};border-left-color:${ctrlData.c};">
+      <div class="bcard-head" style="color:${ctrlData.c};">${ctrlData.icon} ${ctrlData.label}</div>
+      <div class="bcard-body">${ctrlData.body}</div>
+      <div class="bcard-catch" style="background:${ctrlData.cb};border-color:${ctrlData.c};color:#333;">${ctrlData.catch}</div>
+    </div>` : '',
+  ].join('');
+
+  const combo = COMBOS.find(c => c.req.every(r => answers.purpose.has(r)));
+  document.getElementById('r-combo').innerHTML = combo
+    ? `<div class="combo-box"><div class="combo-head">🤝 ${combo.head}</div>${combo.body}<div class="combo-ex">Real examples: ${combo.ex}</div></div>` : '';
+
+  const tension = TENSIONS.find(t => t.pair.every(p => answers.purpose.has(p)));
+  document.getElementById('r-tension').innerHTML = tension
+    ? `<div class="tension-box"><strong>⚠ Design tension</strong>${tension.msg}</div>` : '';
+
+  document.getElementById('r-examples').textContent = getExamples(keys);
+
+  renderOutcome(name);
+  goTo('result');
+  setTimeout(() => { const b=document.getElementById('vfill'); if(b) b.style.width=vol+'%'; }, 500);
+}
+
+function restart() {
+  answers.purpose.clear(); answers.stable=null; answers.supply=null; answers.control=null;
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel-single','sel-multi','dimmed'));
+  document.getElementById('coinName').value='';
+  document.getElementById('sel-count').textContent='0';
+  document.getElementById('supply-conflict').style.display='none';
+  ['warn-1','warn-2','warn-3','warn-4','warn-5'].forEach(id=>document.getElementById(id).style.display='none');
+  deselectGeneratedName();
+  document.getElementById('nb-custom-wrap').classList.remove('active');
+  usingCustom=false;
+  goTo(0);
+}
+</script>
+</body>
+</html>
